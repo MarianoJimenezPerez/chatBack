@@ -1,0 +1,22 @@
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col" class="text-center">#</th>
+            <th scope="col" class="text-center">Title</th>
+            <th scope="col" class="text-center">Price</th>
+            <th scope="col" class="text-center">Thumbnail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each listaProductos}}
+                <tr>
+                    <th scope="row" class="text-center">{{this.id}}</th>
+                    <td class="text-center">{{this.title}}</td>
+                    <td class="text-center">{{this.price}}</td>
+                    <td class="text-center"><img src="{{this.thumbnail}}"></img></td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

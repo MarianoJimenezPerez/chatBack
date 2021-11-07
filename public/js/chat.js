@@ -1,16 +1,36 @@
-const socket = io()
-const chat = document.getElementById('chat');
-const botonEnviar = document.getElementById('boton-enviar');
-botonEnviar.addEventListener('click', (e) => {
-    e.preventDefault()
-    socket.emit('mensaje', chat.value);
-})
+const socket = io.connect()
+const botonEnviar = document.getElementById('boton-enviar')
+const pushearMensaje = () => {
+    const nuevoMensaje = {
+        nombre: document.getElementById('mail-cliente').value,
+        mensaje: document.getElementById('chat').value
+    }
+    socket.emit('mensaje-nuevo', nuevoMensaje);
+    document.getElementById('mail-cliente').value = ''
+    document.getElementById('chat').value = ''
+    console.log(nuevoMensaje)
+    return false
+}
+botonEnviar.addEventListener('click', (pushearMensaje) )
+
 
 socket.on('mensajes' , data => {
-    let mailCliente = document.getElementById('mail-cliente').value
-    const mensajesHTML = data
-        .map(msj => `Nombre: ${mailCliente} -> Mensaje : ${msj.mensaje}` )
-        .join('<br>')
-    const chatHistory = document.getElementById('chat-history');
-    chatHistory.innerHTML = mensajesHTML;
+    renderizarMensajes(data)
 })
+
+//renderizar mensajes 
+const renderizarMensajes = (mensajes) => {
+    const mensajesHTML = mensajes.map((element) => {
+        return ( 
+            `
+                <div>
+                    <p>
+                        <strong>${element.nombre}</strong>
+                        <em>${element.mensaje}</em>
+                    </p>
+                </div>
+            `
+        )
+    }).join(' ')
+    document.getElementById('chat-history').innerHTML = mensajesHTML
+}

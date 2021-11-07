@@ -10,9 +10,20 @@ app.get('/', (req, res) => {
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
 
-//Arrays 
+//Array de mensajes 
 
-const mensajes = [];
+const mensajes = [
+    {
+        nombre: "System",
+        mensaje: "Hola!, bienvenido al chat"
+    }
+];
+const getMensajes = () => mensajes;
+const pushMensaje = mensaje => {
+    mensajes.push(mensaje)
+}
+
+//Array de productos
 const productos = [
     {
         title: "Escuadra",
@@ -36,17 +47,21 @@ const productos = [
 
 
 
-
-let socketGuardado
+//coneión de nuevo socket
 io.on('connection', (socket) => {
-    console.log("conectado");
+    console.log("Nuevo cliente conectado");
+    const mensajes = getMensajes()
     socket.emit('mensajes', mensajes)
-    socketGuardado = socket
-    socket.on('mensaje' , data => {
-        mensajes.push({socketId: socket.id, mensaje: data});
-        io.sockets.emit('mensajes', mensajes)
+
+    //escuchar nuevo mensaje del cliente
+    socket.on('mensaje-nuevo', data => {
+        pushMensaje(data)
+        const actualizarMensajes = getMensajes()
+        io.sockets.emit('mensajes', actualizarMensajes)
     })
 })
+
+
 
 //handlebars
 const handlebars = require('express-handlebars');

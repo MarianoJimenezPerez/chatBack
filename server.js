@@ -5,7 +5,7 @@ const { Server: IOServer} = require('socket.io');
 const app = express();
 app.use(express.static( __dirname + '/public'));
 app.get('/', (req, res) => {
-    res.render("main")
+    res.render("main", {listaProductos: productos})
 })
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
@@ -44,20 +44,34 @@ const productos = [
         id: 3
     }
 ]
-
+const getProductos = () => productos;
+const pushProducto = producto => {
+    productos.push(producto)
+}
+const asignarId = () => {
+    productos[productos.length - 1].id = productos.length
+}
 
 
 //coneión de nuevo socket
 io.on('connection', (socket) => {
     console.log("Nuevo cliente conectado");
     const mensajes = getMensajes()
-    socket.emit('mensajes', mensajes)
+    const cargarProductos = getProductos()
+    socket.emit('actualizar-listado-productos', cargarProductos)
 
     //escuchar nuevo mensaje del cliente
     socket.on('mensaje-nuevo', data => {
         pushMensaje(data)
         const actualizarMensajes = getMensajes()
         io.sockets.emit('mensajes', actualizarMensajes)
+    })
+    //escuchar nuevo producto del cliente
+    socket.on('producto-nuevo', data => {
+        pushProducto(data)
+        asignarId()
+        const actualizarProductos = getProductos()
+        io.sockets.emit('actualizar-listado-productos', actualizarProductos)
     })
 })
 
